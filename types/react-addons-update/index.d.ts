@@ -9,27 +9,25 @@ import * as React from 'react';
 export = React.__Addons.update;
 
 declare module 'react' {
-    interface UpdateSpecCommand {
-        $set?: any;
-        $merge?: {};
-        $apply?(value: any): any;
+    interface UpdateSpecCommand<T> {
+        $set?: T;
+        $merge?: Partial<T>;
+        $apply?(value: T): T;
     }
 
-    interface UpdateSpecPath {
-        [key: string]: UpdateSpec;
-    }
+    type UpdateSpecPath<T> = { [K in keyof T]?: UpdateSpec<T[K]> }
 
-    type UpdateSpec = number[][] | UpdateSpecCommand | UpdateSpecPath;
+    type UpdateSpec<T> = number[][] | UpdateSpecCommand<T> | UpdateSpecPath<T>;
 
-    interface UpdateArraySpec extends UpdateSpecCommand {
-        $push?: any[];
-        $unshift?: any[];
-        $splice?: any[][];
+    interface UpdateArraySpec<T> extends UpdateSpecCommand<T> {
+        $push?: T[];
+        $unshift?: T[];
+        $splice?: T[][];
     }
 
     namespace __Addons {
-        export function update(value: any[], spec: UpdateArraySpec): any[];
-        export function update(value: {}, spec: UpdateSpec): any;
+        export function update<T>(value: T[], spec: UpdateArraySpec<T>): T[];
+        export function update<T extends {}>(value: T, spec: UpdateSpec<T>): T;
     }
 }
 
